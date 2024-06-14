@@ -8,7 +8,12 @@ This repository contains the project repository for the final
 project for Harvard's CS 51 class, Abstraction and Design in 
 Computation. 
 
-See the reposityory description and the writeup for more information.
+This project is an implementation of MiniML, a subset of the 
+OCaml language, in OCaml itself. It is functional and Turing complete.
 
-For more information, see [https://cs51.io](https://cs51.io). 
+See the repository description and the writeup 
+[https://github.com/camilobrownpinilla/miniML_project/blob/main/writeup.pdf]
+for more information.
+
+Also, see readme.pdf for the full project description.
 
