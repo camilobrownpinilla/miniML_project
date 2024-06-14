@@ -1,0 +1,173 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[top=0.85in,left=2.75in,footskip=0.75in,marginparwidth=2in]{geometry}
+
+% use Unicode characters - try changing the option if you run into troubles with special characters (e.g. umlauts)
+\usepackage[utf8]{inputenc}
+
+% clean citations
+\usepackage{cite}
+
+\usepackage{amsmath}
+
+% hyperref makes references clicky. use \url{www.example.com} or \href{www.example.com}{description} to add a clicky url
+\usepackage{nameref,hyperref}
+
+% line numbers
+\usepackage[right]{lineno}
+
+% improves typesetting in LaTeX
+\usepackage{microtype}
+\DisableLigatures[f]{encoding = *, family = * }
+
+% text layout - change as needed
+\raggedright
+\setlength{\parindent}{0.5cm}
+\textwidth 5.25in 
+\textheight 8.75in
+
+\usepackage{setspace} 
+\doublespacing
+
+
+% use adjustwidth environment to exceed text width (see examples in text)
+\usepackage{changepage}
+
+% adjust caption style
+\usepackage[aboveskip=1pt,labelfont=bf,labelsep=period,singlelinecheck=off]{caption}
+
+% remove brackets from references
+\makeatletter
+\renewcommand{\@biblabel}[1]{\quad#1.}
+\makeatother
+
+% headrule, footrule and page numbers
+\usepackage{lastpage,fancyhdr,graphicx}
+\usepackage{epstopdf}
+\pagestyle{myheadings}
+\pagestyle{fancy}
+\fancyhf{}
+\rfoot{\thepage/\pageref{LastPage}}
+\renewcommand{\footrule}{\hrule height 2pt \vspace{2mm}}
+\fancyheadoffset[L]{2.25in}
+\fancyfootoffset[L]{2.25in}
+
+% use \textcolor{color}{text} for colored text (e.g. highlight to-do areas)
+\usepackage{color}
+
+% define custom colors (this one is for figure captions)
+\definecolor{Gray}{gray}{.25}
+
+% this is required to include graphics
+\usepackage{graphicx}
+
+% use if you want to put caption to the side of the figure - see example in text
+\usepackage{sidecap}
+
+% use for have text wrap around figures
+\usepackage{wrapfig}
+\usepackage[pscoord]{eso-pic}
+\usepackage[fulladjust]{marginnote}
+\reversemarginpar
+
+% document begins here
+\begin{document}
+\vspace*{0.35in}
+
+% title goes here:
+\begin{flushleft}
+{\Large
+\textbf\newline{Extensions on the MiniML Language}
+}
+\newline
+% authors go here:
+\\
+Camilo Brown-Pinilla
+\\
+Computer Science 51
+\\
+Harvard University
+
+\end{flushleft}
+
+\section*{Introduction}
+MiniML is a Turing-complete subset of OCaml implemented in OCaml itself. Without extensions, the base version of MiniML only operates on expressions composed of integer and boolean values. There are only a handful of binary and unary operators defined on these values. The evaluation of MiniML expressions manifest either substitution or dynamically-scoped environment semantics. The extensions I present here augment this language by:
+\begin{enumerate}
+    \item Adding support for new atomic types and operations on these new types, as well adding new operations on existing types
+    \item Introducing lexically scoped environment semantics, as seen manifested in the evalution of OCaml. 
+\end{enumerate}
+
+% Theoretically, the Fast BFS regime should produce the quickest solution, but initial testing has shown unexpected results. We further explore these results here.
+
+\section*{New Types and Operations}
+
+\subsubsection*{Types}
+As mentioned before, my extended implementation of MiniML now includes support for new atomic value types. Specifically, MiniML can now operate on floats, strings and chars in addition to bools and ints; all of the same atomic types found in OCaml save for units and bytes.  
+
+\subsubsection*{Operations}
+I have vastly expanded the operations supported in MiniML. I list their syntax and definition alongside the types they operate on, below:
+\begin{itemize}
+    \item[-] \verb|^| Concatenation. Binary operator defined on strings
+    \item[-] \verb|not| (Boolean) Negation. Unary operator defined on bools
+    \item[-] \verb|&&| Boolean and. Binary operator defined on bools
+    \item[-] $||$  Boolean or. Binary operator defined on bools
+    \item[-] \verb|sin| Sine. Unary operator defined on floats
+    \item[-] \verb|cos| Cosine. Unary operator defined on floats
+    \item[-] \verb|**| Exponentiation. Binary operator defined on floats
+    \item[-] \verb|/| Division. Binary operator on ints and floats
+    \item[-] \verb|<>| Not equals. Binary operator on all types
+    \item[-] \verb|>| Greater than. Binary operator on all types
+    \item[-] \verb|>=| Greater than or equal to. Binary operator on all types 
+    \item[-] \verb|<=| Less than or equal to. Binary operator on all types 
+\end{itemize}
+These operations are added on top of the operations defined in the base version of MiniML. Notably, MiniML syntax does not require users to use different operators for the same operation on different types (i.e. \verb|*| vs \verb|*.| for int and float multiplication, respectively. This can be seen as an improvement in usability, especially to beginner OCaml enthusiasts. Just like OCaml, all of these operations can still only operate on expressions of the same type. 
+
+\subsection*{Implementation}
+Implementation of these new types and operations followed exactly as the implementation of the base MiniML types and operators did. In addition to this, I augemented \verb|miniml_lex.mll| and \verb|miniml_parse.mly| to allow the parser to recognize my new definitions.
+
+\subsection*{Demonstration}
+\begin{center}
+    \begin{verbatim}
+        <== not (true || false) = false ;;
+        ==> true
+    \end{verbatim}  
+    \begin{verbatim}
+        <== 42. ** cos 0. ;;
+        ==> 42.
+    \end{verbatim}
+\end{center}
+
+\begin{verbatim}
+        <== let c = "camilo" in let s51 = "lovesocaml" in c ^ s51 ;;
+        ==> camilolovesocaml
+    \end{verbatim}
+
+
+% the * after section prevents numbering
+\section*{Lexically scoped semantics}
+As mentioned in the introduction, MiniML now supports lexically scoped semantics and employs it by default, just as is done in OCaml.  
+
+\subsection*{Implementation}
+These semantics were implemented in much the same way as the substitution and dynamic semantics were. Indeed, lexically scoped and dynamically scoped semantics are almost the same, save for their handling of recursion, function evaluation, and function application.
+
+\pagebreak
+\subsection*{Demonstration}
+There are many different subtle differences in evaluation between dynamically and lexically scoped semantics. Most easily seen, however, is the inclusion of closures in lexically scoped semantics. We see this behavior here:
+
+\begin{center}
+    \begin{verbatim}
+        <== let x = 1 in fun z -> z + 1 ;;
+        ==> ((fun z -> z + 1), [(x, 1)])
+    \end{verbatim}
+\end{center}
+
+Here, the closure of our function in the environment where x is mapped to 1 is printed. 
+
+
+
+\section*{Conclusion}
+By adding support for new types and operators and lexically scoped semantics, my extensions to the MiniML language make it much more similar to OCaml and, in doing so, make it much more usuable than the base MiniML. One nice improvement over standard OCaml is the lack of a need to differentiate between the same operators on different types (\verb|*.| vs \verb|*| for example). While my implementation of MiniML is still rather bare-bones, the software lends itself to further extension nicely. Implementing this language was difficult, but doing so greatly increased my appreciation for all the work done under the hood in parsing and evaluating code. 
+
+
+\end{document}
+
+
